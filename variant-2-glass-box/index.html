@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Glass Archive Box</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap">
+<style>
+@property --a1{syntax:'<color>';inherits:true;initial-value:#3F5BEF}
+@property --a2{syntax:'<color>';inherits:true;initial-value:#8EE6D6}
+
+/* Layout: nested shell. Dark aurora hero holds a glass archive box with folders standing in it; a white panel below holds tabs, folder rows and one full-width action. */
+:root{
+  --bg:#E2E3E7;
+  --shell:#F3F4F6;
+  --shell-line:rgba(18,20,28,.07);
+  --shell-edge:rgba(255,255,255,.9);
+  --panel:#FFFFFF;
+  --seg:#F1F2F5;
+  --thumb:#FFFFFF;
+  --hover:#F6F7F9;
+  --fg:#14151A;
+  --muted:#71757F;
+  --line:#EDEEF1;
+  --line-2:#E2E4E8;
+  --hero:#09090C;
+  --good:#62F0A6;
+  --shadow-shell:0 2px 6px rgba(20,24,40,.05),0 40px 70px -36px rgba(20,24,40,.32);
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --spring:cubic-bezier(.3,1.4,.5,1);
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B0B0D; --shell:#151518; --shell-line:rgba(255,255,255,.07); --shell-edge:rgba(255,255,255,.05);
+    --panel:#1C1C20; --seg:#25252A; --thumb:#36363D; --hover:#24242A;
+    --fg:#F1F1F4; --muted:#9B9EA8; --line:#2A2A30; --line-2:#34343B; --hero:#060608;
+    --shadow-shell:0 2px 6px rgba(0,0,0,.3),0 40px 70px -36px rgba(0,0,0,.8);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B0B0D; --shell:#151518; --shell-line:rgba(255,255,255,.07); --shell-edge:rgba(255,255,255,.05);
+  --panel:#1C1C20; --seg:#25252A; --thumb:#36363D; --hover:#24242A;
+  --fg:#F1F1F4; --muted:#9B9EA8; --line:#2A2A30; --line-2:#34343B; --hero:#060608;
+  --shadow-shell:0 2px 6px rgba(0,0,0,.3),0 40px 70px -36px rgba(0,0,0,.8);
+  color-scheme:dark;
+}
+
+html{height:100%}
+body{
+  min-height:100%;box-sizing:border-box;margin:0;
+  background:var(--bg);color:var(--fg);font-family:var(--sans);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  padding-block:40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-font-smoothing:antialiased;
+}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default}
+:focus-visible{outline:2px solid #6C8CFF;outline-offset:2px}
+
+.shell{position:relative;width:100%;max-width:400px;box-sizing:border-box;padding:8px;border-radius:34px;background:var(--shell);box-shadow:inset 0 0 0 1px var(--shell-line),inset 0 1px 0 var(--shell-edge),var(--shadow-shell)}
+
+/* Hero */
+.hero{position:relative;isolation:isolate;overflow:hidden;border-radius:26px;background:var(--hero);color:#fff;padding:18px 20px 20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);transition:--a1 .8s var(--ease),--a2 .8s var(--ease)}
+.aurora{position:absolute;inset:-30%;z-index:-2;pointer-events:none;filter:blur(18px);background:
+  radial-gradient(22% 20% at 66% 30%,color-mix(in oklab,var(--a2) 70%,transparent),transparent 72%),
+  radial-gradient(42% 38% at 76% 36%,color-mix(in oklab,var(--a1) 85%,transparent),transparent 72%),
+  radial-gradient(36% 26% at 34% 84%,color-mix(in oklab,var(--a1) 32%,transparent),transparent 72%),
+  linear-gradient(122deg,transparent 40%,color-mix(in oklab,var(--a2) 40%,transparent) 48%,transparent 57%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.09;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.ht-text{min-width:0}
+.h-title{display:inline-block;margin:0;font-size:18px;font-weight:600;letter-spacing:-.015em;line-height:1.3}
+.h-sub{margin:1px 0 0;font-size:13px;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.glass{flex:0 0 auto;height:36px;padding:0 15px;border:0;border-radius:99px;background:rgba(255,255,255,.1);color:#fff;font-size:13.5px;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:background .2s}
+.glass:hover{background:rgba(255,255,255,.17)}
+.hero-art{display:flex;justify-content:center;margin:2px 0 -6px}
+.hero-box{display:block;width:268px;max-width:84%;height:auto;overflow:visible}
+.hero-num{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px}
+.big{font-size:46px;font-weight:300;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.big .u{margin-left:6px;font-size:20px;font-weight:400;letter-spacing:-.01em;color:rgba(255,255,255,.55)}
+.chips{display:flex;gap:6px;align-items:center;transform:translateY(-4px)}
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:99px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.82);font-size:12.5px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip.good{padding:0 4px 0 9px;color:var(--good);background:rgba(98,240,166,.12)}
+.arr{width:16px;height:16px;border-radius:50%;background:var(--good);display:grid;place-items:center}
+.arr svg{width:8px;height:8px;fill:none;stroke:#07140D;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chip:not(.good) .arr{display:none}
+.hbar-hit{margin-top:14px;padding-block:6px;cursor:pointer;touch-action:manipulation}
+.hbar{display:flex;gap:3px;height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.hseg{flex:0 0 auto;height:100%;border-radius:3px;background:var(--c);transition:width .9s var(--ease),opacity .25s}
+.hbar:not(.ready) .hseg{transition:none}
+.hbar.dim .hseg:not(.on){opacity:.22}
+
+/* Glass box */
+.bx{transform-box:fill-box;transform-origin:50% 100%;transition:transform .45s var(--spring)}
+.box-on .bx{transform:translateY(-3px)}
+.side-glass{transition:filter .3s}
+.box-on .side-glass{filter:brightness(1.15) saturate(1.1)}
+.b-glow{opacity:.55}
+.mb .b-glow{opacity:.28}
+.bf .lift{transition:transform .7s var(--spring)}
+.bf .sheet{transition:transform .55s var(--spring)}
+.bf.on .sheet{transform:translateY(-9px)}
+.hero-box .sharp .bf,.hero-box .face{cursor:pointer}
+.ln{fill:none;stroke:#C5D0DB;stroke-width:1.6;stroke-linecap:round}
+#bundleInner{opacity:0;transform-box:fill-box;transform-origin:center}
+
+/* Glass folder (row icons) */
+.s-l{stop-color:var(--l)} .s-m{stop-color:var(--m)} .s-d{stop-color:var(--d)}
+.s-bl{stop-color:var(--bl)} .s-bd{stop-color:var(--bd)}
+.f-sh{fill:var(--d);opacity:.32}
+.f-rim{fill:none;stroke:var(--d);stroke-opacity:.35;stroke-width:1}
+.pm{transform:translateY(calc(var(--rise,0) * -1px));transition:transform .7s var(--spring)}
+
+/* Panel */
+.fold{display:grid;grid-template-rows:1fr;transition:grid-template-rows .55s var(--ease)}
+.shell.collapsed .fold{grid-template-rows:0fr}
+.fold-in{min-height:0;overflow:hidden}
+.panel{position:relative;margin-top:8px;padding:8px;border-radius:26px;background:var(--panel);box-shadow:0 1px 2px rgba(20,24,40,.04)}
+.tabs{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:16px;background:var(--seg)}
+.thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:12px;background:var(--thumb);box-shadow:0 1px 2px rgba(20,24,40,.08),0 6px 14px -6px rgba(20,24,40,.18);transition:transform .45s var(--spring)}
+.tabs[data-tab="access"] .thumb{transform:translateX(100%)}
+.tab{position:relative;z-index:1;height:38px;border:0;border-radius:12px;background:none;color:var(--muted);font-size:14px;font-weight:500;transition:color .2s}
+.tab[aria-selected="true"]{color:var(--fg)}
+.list{display:flex;flex-direction:column;margin-top:6px}
+.row,.person{position:relative;display:grid;grid-template-columns:52px minmax(0,1fr) auto auto;align-items:center;column-gap:12px;width:100%;box-sizing:border-box;padding:9px 8px;border:0;border-radius:16px;background:none;text-align:left;transition:background .2s}
+.person{grid-template-columns:52px minmax(0,1fr) auto}
+.row::before,.person::before{content:"";position:absolute;top:0;left:72px;right:8px;height:1px;background:var(--line);transition:opacity .2s}
+.row:first-child::before,.person:first-child::before,.row:hover::before,.row.on::before,.row:hover + .row::before,.row.on + .row::before{opacity:0}
+.row:hover,.row.on{background:var(--hover)}
+.ico{width:52px;height:42px;display:grid;place-items:center}
+.ico svg{pointer-events:none}
+.mf{display:block;width:62px;height:auto;overflow:visible}
+.mb{display:block;width:58px;height:auto;overflow:visible}
+.row:hover .mf,.row.on .mf{--rise:12}
+.r-txt{display:flex;flex-direction:column;min-width:0}
+.r-name{font-size:15px;font-weight:500;letter-spacing:-.01em;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-sub{font-size:12.5px;line-height:1.35;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.r-size{font-size:15px;font-weight:500;letter-spacing:-.01em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill{min-width:44px;box-sizing:border-box;padding:4px 8px;border-radius:9px;text-align:center;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;background:color-mix(in oklab,var(--c) 16%,var(--panel));color:color-mix(in oklab,var(--c) 55%,var(--fg))}
+
+.action{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:100%;height:52px;margin-top:8px;border:0;border-radius:18px;background:var(--panel);color:var(--fg);font-size:14.5px;font-weight:600;box-shadow:inset 0 0 0 1px var(--line-2),0 1px 2px rgba(20,24,40,.04);transition:transform .15s,box-shadow .2s}
+.action:not(:disabled):hover{box-shadow:inset 0 0 0 1px var(--line-2),0 8px 18px -10px rgba(20,24,40,.3)}
+.action:not(:disabled):active{transform:scale(.985)}
+.prog{position:absolute;inset:0;background:var(--seg);transform-origin:left;transform:scaleX(0)}
+.lbl{position:relative;display:inline-flex;align-items:center;gap:8px}
+.lbl svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.lbl .muted{color:var(--muted);font-weight:500}
+.ok{width:20px;height:20px;border-radius:50%;background:#1DB874;display:grid;place-items:center}
+.lbl .ok svg{width:11px;height:11px;stroke:#fff;stroke-width:2.2}
+
+.av{width:40px;height:40px;justify-self:center;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:600;color:#1B1D24;background:linear-gradient(140deg,var(--l),var(--m));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 0 0 1px rgba(0,0,0,.05)}
+.role{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;border:0;border-radius:99px;background:var(--seg);color:var(--fg);font-size:12.5px;font-weight:500;white-space:nowrap}
+.role svg{width:10px;height:10px;fill:none;stroke:var(--muted);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.role.static{background:none;color:var(--muted)}
+.role.invited{background:color-mix(in oklab,#EDB422 18%,var(--panel));color:color-mix(in oklab,#B07D00 75%,var(--fg))}
+
+.fly{position:absolute;inset:0;pointer-events:none;z-index:10}
+.sheet-fly{position:absolute;left:0;top:0;width:18px;height:23px;border-radius:4px;box-shadow:0 0 0 .5px rgba(20,24,40,.1),0 6px 14px -4px rgba(20,24,40,.4);
+  background:linear-gradient(#D5DCE4,#D5DCE4) 3px 10px/11px 1.5px no-repeat,linear-gradient(#D5DCE4,#D5DCE4) 3px 14px/7px 1.5px no-repeat,linear-gradient(#FFFFFF,#ECF1F5)}
+.sheet-fly::before{content:"";position:absolute;left:3px;right:3px;top:3px;height:3px;border-radius:2px;background:var(--tint)}
+
+.hint{margin:0;max-width:400px;text-align:center;font-size:12.5px;line-height:1.5;color:var(--muted)}
+
+@media (max-width:420px){
+  .big{font-size:40px}
+  .row,.person{column-gap:10px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="fbL" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="fbS" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="fbM" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.5"/></filter>
+    <filter id="fds" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="-1.5" stdDeviation="2.2" flood-color="#08202E" flood-opacity=".22"/></filter>
+  </defs>
+</svg>
+
+<main class="shell" id="shell">
+  <section class="hero" id="hero" aria-label="Drive overview">
+    <div class="aurora"></div>
+    <header class="hero-top">
+      <div class="ht-text">
+        <h1 class="h-title" id="hTitle">Brand drive</h1>
+        <p class="h-sub" id="hSub">1 284 files · 5 people</p>
+      </div>
+      <button class="glass" id="lessBtn" type="button" aria-expanded="true" aria-controls="fold">Show less</button>
+    </header>
+    <div class="hero-art" id="heroArt"></div>
+    <div class="hero-num">
+      <span class="big"><span id="hNum">56,87</span><span class="u">GB</span></span>
+      <span class="chips">
+        <span class="chip" id="hChip">of 100 GB</span>
+        <span class="chip good" id="hDelta" hidden><span id="hDeltaT">−10,10 GB</span><span class="arr"><svg viewBox="0 0 10 10"><path d="M3 3l4 4M7.2 3.6V7.2H3.6"/></svg></span></span>
+      </span>
+    </div>
+    <div class="hbar-hit" id="hbarHit" aria-hidden="true"><div class="hbar" id="hbar"></div></div>
+  </section>
+
+  <div class="fold" id="fold">
+    <div class="fold-in">
+      <section class="panel" id="panel">
+        <div class="tabs" id="tabs" role="tablist" data-tab="folders">
+          <span class="thumb" aria-hidden="true"></span>
+          <button class="tab" id="tab-folders" role="tab" type="button" data-tab="folders" aria-selected="true" aria-controls="view-folders">Folders</button>
+          <button class="tab" id="tab-access" role="tab" type="button" data-tab="access" aria-selected="false" aria-controls="view-access" tabindex="-1">Access</button>
+        </div>
+
+        <div class="view" id="view-folders" role="tabpanel" aria-labelledby="tab-folders">
+          <div class="list" id="list"></div>
+          <button class="action" id="archiveBtn" type="button"><span class="prog"></span><span class="lbl" id="archiveLbl"></span></button>
+        </div>
+
+        <div class="view" id="view-access" role="tabpanel" aria-labelledby="tab-access" hidden>
+          <div class="list" id="people"></div>
+          <button class="action" id="inviteBtn" type="button"><span class="prog"></span><span class="lbl" id="inviteLbl"></span></button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="fly" id="fly"></div>
+</main>
+
+<p class="hint">Point at a folder to lift it out of the box, then archive the idle files.</p>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+
+  const CAP = 100;
+  // l → m → d is the front gradient, bl → bd the back panel, a1/a2 the hero aurora
+  const PAL = {
+    red:    {l:'#FBD0CA', m:'#F08378', d:'#DF463E', bl:'#F2A69D', bd:'#E2665E', a1:'#E3413A', a2:'#FF9E8A'},
+    yellow: {l:'#FEF1BE', m:'#F8D769', d:'#EDB422', bl:'#F6DC86', bd:'#EAC042', a1:'#E19A0C', a2:'#FFE08A'},
+    blue:   {l:'#B3E3FA', m:'#6FB7EF', d:'#3A90DA', bl:'#8DC8EE', bd:'#5FA6E0', a1:'#2F6FF0', a2:'#8FD0FF'},
+    gray:   {l:'#EEEFF2', m:'#C4C6CC', d:'#8E9097', bl:'#CFD1D6', bd:'#A7A9AF', a1:'#6F7385', a2:'#D3D6E0'},
+    teal:   {l:'#C4F1E8', m:'#62CDB9', d:'#1F9A85', bl:'#93DFD1', bd:'#4FBFA9', a1:'#0F9C86', a2:'#86F2DD'},
+  };
+  const OVERVIEW = {a1:'#3F5BEF', a2:'#8EE6D6'};
+  const FOLDERS = [
+    {id:'marketing', name:'Marketing',     tags:'Post templates, ads',     pal:'red'},
+    {id:'brand',     name:'Brand Assets',  tags:'Brand book, vector logo', pal:'yellow'},
+    {id:'product',   name:'Product Shots', tags:'Renders, lifestyle',      pal:'blue'},
+    {id:'media',     name:'Media Kit',     tags:'Logo, font, pattern',     pal:'gray'},
+    {id:'archive',   name:'Archive',       tags:'Packed, read-only',       pal:'teal'},
+  ];
+  const IDS = FOLDERS.map(f => f.id);
+  const BY = Object.fromEntries(FOLDERS.map(f => [f.id, f]));
+  // [GB, files]. Archiving moves 23 idle files (13,46 GB) and packs them into 3,36 GB.
+  const DATA = {
+    before: {marketing:[21.06, 61], brand:[14.52, 486], product:[9.84, 214], media:[3.61, 127], archive:[7.84, 396]},
+    after:  {marketing:[13.66, 58], brand:[10.38, 475], product:[7.92, 205], media:[3.61, 127], archive:[11.20, 419]},
+  };
+  const MOVES = [['marketing', 2], ['brand', 2], ['product', 2]];
+  const state = {archived:false, active:null, pinned:null, busy:false};
+
+  const fmtGB = v => v.toFixed(2).replace('.', ',');
+  const fmtInt = v => Math.round(v).toLocaleString('en-US').replace(/,/g, ' ');
+  const sum = (s, i) => IDS.reduce((t, c) => t + s[c][i], 0);
+  const snap = () => {
+    const s = DATA[state.archived ? 'after' : 'before'];
+    return {s, used: sum(s, 0), files: sum(s, 1)};
+  };
+
+  // Rolling numbers
+  const tweens = new WeakMap();
+  function tween(el, to, fmt, dur) {
+    const prev = tweens.get(el);
+    if (prev) cancelAnimationFrame(prev.raf);
+    const t = {v: prev ? prev.v : to, raf: 0};
+    const from = t.v;
+    tweens.set(el, t);
+    if (reduce || !dur || Math.abs(from - to) < 1e-6) { t.v = to; el.textContent = fmt(to); return; }
+    const t0 = performance.now();
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      t.v = from + (to - from) * (1 - Math.pow(1 - p, 3));
+      el.textContent = fmt(t.v);
+      if (p < 1) t.raf = requestAnimationFrame(step);
+    };
+    t.raf = requestAnimationFrame(step);
+  }
+
+  // ---------- Glass archive box ----------
+  // Front face A(60,128) B(190,150) C(190,236) D(60,214); side B E(282,108) F(282,192) C; opening A G(152,86) E B.
+  const K = 22 / 130;
+  const KS = -42 / 92;
+  const frontY = x => 128 + K * (x - 60);
+  const FH = 170;
+  const BOX_FOLDERS = [ // back to front
+    {cat:'marketing', x:98,  w:112, tab:[12, 40]},
+    {cat:'brand',     x:156, w:90,  tab:[46, 34]},
+    {cat:'media',     x:150, w:80,  tab:[40, 30]},
+    {cat:'product',   x:66,  w:100, tab:[0, 42]},
+  ];
+  const FRONT_L = 'M0 4Q0 0 4 0H130V86H12Q0 86 0 74Z';
+  const SIDE_L = 'M0 0H88Q92 0 92 4V74Q92 86 80 86H0Z';
+  const WAVES = 'M-10 -6q3.4-2.8 6.7 0t6.7 0t6.6 0M-12 0q4-3 8 0t8 0t8 0M-10 6q3.4-2.8 6.7 0t6.7 0t6.6 0';
+  const fm = `matrix(1 ${K.toFixed(4)} 0 1 60 128)`;
+  const sm = `matrix(1 ${KS.toFixed(4)} 0 1 190 150)`;
+
+  function backPath(w, tx, tw) {
+    const t = 11, r = 6;
+    const start = tx === 0
+      ? `M0 ${FH} V${r} Q0 0 ${r} 0`
+      : `M0 ${FH} V${t + r} Q0 ${t} ${r} ${t} H${tx - 3} L${tx + 1} 3 Q${tx + 3} 0 ${tx + 7} 0`;
+    return `${start} H${tx + tw - 7} Q${tx + tw - 3} 0 ${tx + tw - 1} 3 L${tx + tw + 3} ${t} H${w - r} Q${w} ${t} ${w} ${t + r} V${FH} Z`;
+  }
+  const frontPanel = w => `M0 ${FH} V33 Q0 26 7 26 H${w - 7} Q${w} 26 ${w} 33 V${FH} Z`;
+  const frontEdge = w => `M.8 33Q.8 26.8 7 26.8H${w - 7}Q${w - .8} 26.8 ${w - .8} 33`;
+
+  function boxFolders(u, sharp) {
+    return BOX_FOLDERS.map(f => {
+      const back = backPath(f.w, ...f.tab);
+      return `<g class="bf" data-cat="${f.cat}" ${sharp ? 'filter="url(#fds)"' : ''} transform="matrix(1 ${K.toFixed(4)} 0 1 ${f.x} ${(frontY(f.x) - 30).toFixed(2)})">
+        <g class="lift">
+          <path d="${back}" fill="url(#${u}${f.cat}b)"/>
+          <path d="${back}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.2"/>
+          <g class="sheet">
+            <rect x="6" y="14" width="${f.w - 12}" height="${FH}" rx="3" fill="url(#${u}p)"/>
+            <path class="ln" d="M14 21H${Math.round(f.w * .55)}M14 26H${Math.round(f.w * .4)}M14 31H${Math.round(f.w * .5)}"/>
+          </g>
+          <path d="${frontPanel(f.w)}" fill="url(#${u}${f.cat}f)"/>
+          <path d="${frontPanel(f.w)}" fill="url(#${u}gl)"/>
+          <path d="${frontEdge(f.w)}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="1.3" stroke-linecap="round"/>
+        </g>
+      </g>`;
+    }).join('');
+  }
+
+  function boxSVG(u, cls, viewBox, withBundle) {
+    const t = PAL.teal;
+    const grads = BOX_FOLDERS.map(f => {
+      const p = PAL[BY[f.cat].pal];
+      return `<linearGradient id="${u}${f.cat}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.bl}"/><stop offset="1" stop-color="${p.bd}"/></linearGradient>
+        <linearGradient id="${u}${f.cat}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${p.l}"/><stop offset=".55" stop-color="${p.m}"/><stop offset="1" stop-color="${p.d}"/></linearGradient>`;
+    }).join('');
+    const bundle = withBundle ? `
+      <g transform="translate(150 18)"><g id="bundleInner">
+        <rect x="-22" y="-15" width="44" height="31" rx="4" fill="url(#${u}p)" stroke="#2A3E52" stroke-opacity=".12" transform="rotate(8)"/>
+        <g transform="rotate(-3)">
+          <rect x="-23" y="-16" width="46" height="31" rx="4" fill="url(#${u}p)" stroke="#2A3E52" stroke-opacity=".12"/>
+          <path class="ln" d="M-17 -9H-8M-17 -4H-10M7 -9H16M7 -4H13"/>
+          <rect x="-4.5" y="-19" width="9" height="37" rx="2" fill="url(#${u}bs)"/>
+          <path d="M-3.5 -18H3.5" stroke="#fff" stroke-opacity=".7" stroke-linecap="round"/>
+        </g>
+      </g></g>` : '';
+    return `<svg class="${cls}" viewBox="${viewBox}" aria-hidden="true">
+      <defs>
+        ${grads}
+        <linearGradient id="${u}p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E7EEF4"/></linearGradient>
+        <radialGradient id="${u}gl" cx=".2" cy=".1" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <linearGradient id="${u}bf" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F1F5F9"/><stop offset="1" stop-color="#D6E1EA"/></linearGradient>
+        <linearGradient id="${u}bs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${t.l}"/><stop offset=".5" stop-color="${t.m}"/><stop offset="1" stop-color="${t.d}"/></linearGradient>
+        <linearGradient id="${u}bv" x1="0" y1="0" x2="1" y2="0"><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset=".7" stop-color="#fff" stop-opacity=".2"/><stop offset=".85" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <linearGradient id="${u}bi" x1=".4" y1="0" x2=".6" y2="1"><stop offset="0" stop-color="#0B3A35"/><stop offset="1" stop-color="#1D6C61"/></linearGradient>
+        <linearGradient id="${u}hd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#21404F" stop-opacity=".34"/><stop offset="1" stop-color="#21404F" stop-opacity=".12"/></linearGradient>
+        <clipPath id="${u}in"><polygon points="-40,-160 380,-160 282,108 190,150 60,128 -40,128"/></clipPath>
+        <clipPath id="${u}fc"><polygon points="60,128 190,150 190,236 60,214"/><polygon points="190,150 282,108 282,192 190,236"/></clipPath>
+      </defs>
+      <polygon class="b-glow" points="70,212 190,236 280,194 284,206 194,250 74,226" fill="${t.d}" filter="url(#fbL)"/>
+      <g class="bx">
+        <polygon points="60,128 152,86 282,108 190,150" fill="url(#${u}bi)"/>
+        <path d="M60 128L152 86L282 108" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.2" stroke-linejoin="round"/>
+        <g clip-path="url(#${u}in)"><g class="sharp">${boxFolders(u, true)}</g>${bundle}</g>
+        <path d="${FRONT_L}" transform="${fm}" fill="#C9D4DE"/>
+        <path d="${SIDE_L}" transform="${sm}" fill="${t.d}"/>
+        <g clip-path="url(#${u}fc)"><g filter="url(#fbM)">${boxFolders(u, false)}</g></g>
+        <g class="face" transform="${fm}">
+          <path d="${FRONT_L}" fill="url(#${u}bf)" fill-opacity=".8"/>
+          <path d="${FRONT_L}" fill="url(#${u}gl)"/>
+          <path d="${FRONT_L}" fill="none" stroke="#0A2A3A" stroke-opacity=".1"/>
+          <path d="M4 .8H129" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+          <rect x="45" y="15.4" width="40" height="13" rx="6.5" fill="#fff" opacity=".85"/>
+          <rect x="45" y="14" width="40" height="13" rx="6.5" fill="url(#${u}hd)"/>
+          <g transform="translate(106 66)" fill="none" stroke-linecap="round" stroke-width="2">
+            <path d="${WAVES}" stroke="#0A2A3A" stroke-opacity=".12" transform="translate(0 1.2)"/>
+            <path d="${WAVES}" stroke="#fff" stroke-opacity=".9"/>
+          </g>
+        </g>
+        <g class="face side-glass" transform="${sm}">
+          <path d="${SIDE_L}" fill="url(#${u}bs)" fill-opacity=".86"/>
+          <path d="${SIDE_L}" fill="url(#${u}bv)"/>
+          <path d="M.8 1.5V85" stroke="#fff" stroke-opacity=".6" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M1.5 .8H88" stroke="#fff" stroke-opacity=".85" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>`;
+  }
+
+  function applyLifts(svg, s, active, intro) {
+    svg.querySelectorAll('.bf').forEach(g => {
+      const c = g.dataset.cat, on = active === c;
+      g.classList.toggle('on', on);
+      const lift = intro ? 0 : s[c][0] * 2.8 + (on ? 16 : 0);
+      g.querySelector('.lift').style.transform = `translateY(${-lift}px)`;
+    });
+  }
+
+  // ---------- Glass folder (row icons) ----------
+  const FRONT = 'M0 44Q0 24 20 24H84C102 24 106 44 124 44H188Q208 44 208 64V136Q208 156 188 156H20Q0 156 0 136Z';
+  const ABOVE = 'M-40 -80H260V44H124C106 44 102 24 84 24H-40Z';
+  const EDGE = 'M.8 44Q.8 24.8 20 24.8H84C102 24.8 106 44.8 124 44.8H188Q207.2 44.8 207.2 64';
+  const papers = u => `
+    <rect x="28" y="10" width="108" height="128" rx="9" fill="url(#${u}p)" transform="rotate(-3 82 74)"/>
+    <rect x="96" y="4" width="88" height="128" rx="9" fill="url(#${u}p)" transform="rotate(4 140 68)"/>`;
+  let uid = 0;
+  function folderSVG(pal) {
+    const u = 'g' + (uid++), p = PAL[pal];
+    return `<svg class="mf" viewBox="-24 -16 256 206" style="--l:${p.l};--m:${p.m};--d:${p.d};--bl:${p.bl};--bd:${p.bd}" aria-hidden="true">
+      <defs>
+        <linearGradient id="${u}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="s-bl"/><stop offset="1" class="s-bd"/></linearGradient>
+        <linearGradient id="${u}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" class="s-l"/><stop offset=".55" class="s-m"/><stop offset="1" class="s-d"/></linearGradient>
+        <linearGradient id="${u}p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EFF5"/></linearGradient>
+        <radialGradient id="${u}h" cx=".22" cy=".18" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <linearGradient id="${u}s" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="#0A1A3A" stop-opacity="0"/><stop offset="1" stop-color="#0A1A3A" stop-opacity=".16"/></linearGradient>
+        <clipPath id="${u}c"><path d="${FRONT}"/></clipPath>
+        <clipPath id="${u}a"><path d="${ABOVE}"/></clipPath>
+      </defs>
+      <rect class="f-sh" x="20" y="126" width="168" height="42" rx="21" filter="url(#fbL)"/>
+      <rect width="208" height="156" rx="24" fill="url(#${u}b)"/>
+      <rect x=".75" y=".75" width="206.5" height="154.5" rx="23.25" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="1.5"/>
+      <g clip-path="url(#${u}a)"><g class="pm">${papers(u)}</g></g>
+      <g clip-path="url(#${u}c)"><g class="pm" filter="url(#fbS)">${papers(u)}</g></g>
+      <path d="${FRONT}" fill="url(#${u}f)" fill-opacity=".88"/>
+      <path d="${FRONT}" fill="url(#${u}h)"/>
+      <path d="${FRONT}" fill="url(#${u}s)"/>
+      <path class="f-rim" d="${FRONT}"/>
+      <path d="${EDGE}" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  // ---------- Build ----------
+  $('#heroArt').innerHTML = boxSVG('hb', 'hero-box', '40 0 278 254', true);
+  const heroSvg = $('#heroArt svg'), hero = $('#hero');
+  const hbar = $('#hbar');
+  hbar.innerHTML = FOLDERS.map(f => `<span class="hseg" data-cat="${f.id}" style="--c:${PAL[f.pal].m}"></span>`).join('');
+  const hsegs = [...hbar.children];
+  $('#list').innerHTML = FOLDERS.map(f => `
+    <button class="row" id="row-${f.id}" type="button" data-cat="${f.id}" aria-pressed="false" style="--c:${PAL[f.pal].d}">
+      <span class="ico">${f.id === 'archive' ? boxSVG('mb', 'mb', '50 44 252 214', false) : folderSVG(f.pal)}</span>
+      <span class="r-txt"><span class="r-name">${f.name}</span><span class="r-sub"><span class="r-files"></span> files · ${f.tags}</span></span>
+      <span class="r-size"></span>
+      <span class="pill"></span>
+    </button>`).join('');
+  const rows = [...document.querySelectorAll('.row')];
+  const miniBox = $('#row-archive svg');
+
+  const hTitle = $('#hTitle'), hSub = $('#hSub'), hNum = $('#hNum'), hChip = $('#hChip'), hDelta = $('#hDelta'), hDeltaT = $('#hDeltaT');
+
+  function swapText(el, text) {
+    if (el.textContent === text) return;
+    el.textContent = text;
+    if (!reduce) el.animate(
+      [{opacity:0, transform:'translateY(5px)', filter:'blur(3px)'}, {opacity:1, transform:'none', filter:'blur(0)'}],
+      {duration:260, easing:'cubic-bezier(.2,.8,.2,1)'});
+  }
+  function showDelta(diff) {
+    if (diff == null) {
+      if (!hDelta.hidden && !hDelta.dataset.out) {
+        hDelta.dataset.out = '1';
+        const done = () => { hDelta.hidden = true; delete hDelta.dataset.out; };
+        if (reduce) return done();
+        hDelta.animate([{opacity:1, transform:'scale(1)'}, {opacity:0, transform:'scale(.8)'}], {duration:160}).onfinish = done;
+      }
+      return;
+    }
+    hDeltaT.textContent = (diff < 0 ? '−' : '+') + fmtGB(Math.abs(diff)) + ' GB' + (diff > 0 ? ' packed' : '');
+    hDelta.classList.toggle('good', diff < 0);
+    delete hDelta.dataset.out;
+    hDelta.getAnimations().forEach(a => a.cancel());
+    if (hDelta.hidden) {
+      hDelta.hidden = false;
+      if (!reduce) hDelta.animate([{opacity:0, transform:'scale(.6)'}, {opacity:1, transform:'scale(1)'}], {duration:420, easing:'cubic-bezier(.3,1.5,.5,1)'});
+    }
+  }
+
+  function render(dur = 360) {
+    const {s, used, files} = snap();
+    const a = state.active, f = a && BY[a];
+    const p = f ? PAL[f.pal] : OVERVIEW;
+    hero.style.setProperty('--a1', p.a1);
+    hero.style.setProperty('--a2', p.a2);
+
+    applyLifts(heroSvg, s, a);
+    applyLifts(miniBox, s, null);
+    heroSvg.classList.toggle('box-on', a === 'archive');
+
+    swapText(hTitle, f ? f.name : 'Brand drive');
+    hSub.textContent = f ? `${fmtInt(s[a][1])} files · ${f.tags}` : `${fmtInt(files)} files · ${peopleCount()} people`;
+    tween(hNum, f ? s[a][0] : used, fmtGB, dur);
+    hChip.textContent = f ? `${Math.round(s[a][0] / used * 100)}% of used` : `of ${CAP} GB`;
+    const b = DATA.before;
+    const diff = f ? s[a][0] - b[a][0] : used - sum(b, 0);
+    showDelta(state.archived && Math.abs(diff) > .001 ? diff : null);
+
+    hsegs.forEach(seg => {
+      const c = seg.dataset.cat;
+      seg.style.width = (s[c][0] / CAP * 100) + '%';
+      seg.classList.toggle('on', a === c);
+    });
+    hbar.classList.toggle('dim', !!a);
+
+    rows.forEach(r => {
+      const c = r.dataset.cat;
+      r.classList.toggle('on', a === c);
+      r.setAttribute('aria-pressed', String(state.pinned === c));
+      tween(r.querySelector('.r-size'), s[c][0], v => fmtGB(v) + ' GB', dur);
+      tween(r.querySelector('.r-files'), s[c][1], fmtInt, dur);
+      tween(r.querySelector('.pill'), s[c][0] / used * 100, v => Math.round(v) + '%', dur);
+    });
+  }
+
+  // Hover previews, click pins
+  const hover = c => { state.active = c ?? state.pinned; render(); };
+  const pin = c => { state.pinned = state.pinned === c ? null : c; state.active = c; render(); };
+  const bindHover = (el, c) => {
+    el.addEventListener('pointerenter', () => hover(c));
+    el.addEventListener('pointerleave', () => hover(null));
+    el.addEventListener('click', () => pin(c));
+  };
+  rows.forEach(r => {
+    const c = r.dataset.cat;
+    bindHover(r, c);
+    r.addEventListener('focus', () => hover(c));
+    r.addEventListener('blur', () => hover(null));
+  });
+  heroSvg.querySelectorAll('.sharp .bf').forEach(g => bindHover(g, g.dataset.cat));
+  heroSvg.querySelectorAll('.face').forEach(g => bindHover(g, 'archive'));
+  const hbarHit = $('#hbarHit');
+  function catAtX(x) {
+    const r = hbar.getBoundingClientRect(), gbAt = (x - r.left) / r.width * CAP, {s} = snap();
+    let acc = 0;
+    for (const c of IDS) { acc += s[c][0]; if (gbAt <= acc) return c; }
+    return null;
+  }
+  hbarHit.addEventListener('pointermove', e => { const c = catAtX(e.clientX); if (c !== state.active) hover(c); });
+  hbarHit.addEventListener('pointerleave', () => hover(null));
+  hbarHit.addEventListener('click', e => { const c = catAtX(e.clientX); if (c) pin(c); });
+  const clear = () => { if (state.pinned || state.active) { state.pinned = state.active = null; render(); } };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') clear(); });
+  document.addEventListener('click', e => { if (state.pinned && !e.target.closest('.row, .hbar-hit, .bf, .face')) clear(); });
+
+  // ---------- Archive: loose sheets fly up, get tied into a bundle, the bundle drops into the box ----------
+  const shell = $('#shell'), fly = $('#fly');
+  const bundle = $('#bundleInner'), bx = heroSvg.querySelector('.bx');
+  const archiveBtn = $('#archiveBtn'), archiveLbl = $('#archiveLbl');
+  const ICON = {
+    archive:'<svg viewBox="0 0 20 20"><path d="M3.5 8h13v7.5A1.5 1.5 0 0 1 15 17H5a1.5 1.5 0 0 1-1.5-1.5zM2.5 4.5a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1V8h-15zM8 11.5h4"/></svg>',
+    ok:'<span class="ok"><svg viewBox="0 0 12 12"><path d="M3 6.2l2 2L9 4"/></svg></span>',
+    plus:'<svg viewBox="0 0 20 20"><path d="M10 4.5v11M4.5 10h11"/></svg>',
+  };
+  function setLabel(lbl, html) {
+    lbl.innerHTML = html;
+    if (!reduce) lbl.animate([{opacity:0, transform:'translateY(4px)'}, {opacity:1, transform:'none'}], {duration:240, easing:'cubic-bezier(.2,.8,.2,1)'});
+  }
+  function setArchive(mode) {
+    archiveBtn.dataset.mode = mode;
+    archiveBtn.disabled = mode === 'busy' || mode === 'undoing';
+    const prog = archiveBtn.querySelector('.prog');
+    prog.getAnimations().forEach(a => a.cancel());
+    if (mode === 'idle') setLabel(archiveLbl, `${ICON.archive}<span>Archive 23 idle files</span><span class="muted">· 10,10 GB</span>`);
+    if (mode === 'done') setLabel(archiveLbl, `${ICON.ok}<span>Archived 23 files</span><span class="muted">· Undo</span>`);
+    if (mode === 'busy' || mode === 'undoing') {
+      setLabel(archiveLbl, `<span>${mode === 'busy' ? 'Packing 23 files…' : 'Restoring 23 files…'}</span>`);
+      if (!reduce) prog.animate([{transform:'scaleX(0)'}, {transform:'scaleX(1)'}], {duration: mode === 'busy' ? 1750 : 1300, easing:'cubic-bezier(.4,0,.2,1)', fill:'forwards'});
+    }
+  }
+
+  const play = (el, frames, opts) => {
+    el.getAnimations().forEach(a => a.cancel());
+    return el.animate(frames, {fill:'forwards', ...opts});
+  };
+  function bump(el, arrive) {
+    if (reduce) return;
+    el.animate(arrive
+      ? [{transform:'scale(1)'}, {transform:'translateY(-2px) scale(1.14)', offset:.35}, {transform:'scale(.97)', offset:.7}, {transform:'scale(1)'}]
+      : [{transform:'translateY(0)'}, {transform:'translateY(2px) scale(.95)', offset:.4}, {transform:'translateY(0)'}],
+      {duration: arrive ? 440 : 300, easing:'ease-out'});
+  }
+  const local = (x, y) => { const r = shell.getBoundingClientRect(); return {x: x - r.left, y: y - r.top}; };
+  const bundlePt = () => {
+    const p = new DOMPoint(150, 18).matrixTransform(heroSvg.getScreenCTM());
+    return local(p.x, p.y);
+  };
+  const iconPt = el => { const a = el.getBoundingClientRect(); return local(a.left + a.width / 2, a.top + a.height / 2 - 6); };
+
+  function flySheet(p0, p1, delay, tint) {
+    if (reduce) return Promise.resolve();
+    const el = document.createElement('div');
+    el.className = 'sheet-fly';
+    el.style.setProperty('--tint', tint);
+    fly.appendChild(el);
+    const cx = Math.max(p0.x, p1.x) + 60 + Math.random() * 60, cy = (p0.y + p1.y) / 2 + 30;
+    const frames = [], N = 18;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N, u = 1 - t;
+      const x = u * u * p0.x + 2 * u * t * cx + t * t * p1.x - 9;
+      const y = u * u * p0.y + 2 * u * t * cy + t * t * p1.y - 11.5;
+      const sc = t < .15 ? .5 + t / .15 * .5 : t > .8 ? 1 - (t - .8) / .2 * .45 : 1;
+      frames.push({transform:`translate(${x}px,${y}px) rotate(${Math.sin(t * Math.PI) * 22 - 6}deg) scale(${sc})`, opacity: t < .08 ? t / .08 : t > .92 ? (1 - t) / .08 : 1});
+    }
+    return el.animate(frames, {duration:840, delay, easing:'cubic-bezier(.45,0,.25,1)', fill:'both'})
+      .finished.then(() => el.remove());
+  }
+
+  async function archive() {
+    state.busy = true;
+    setArchive('busy');
+    const target = bundlePt();
+    const flights = [];
+    let k = 0;
+    MOVES.forEach(([id, n]) => {
+      const ico = $(`#row-${id} .ico`);
+      for (let j = 0; j < n; j++) {
+        const d = k++ * 70;
+        if (!reduce) setTimeout(() => bump(ico, false), d);
+        flights.push(flySheet(iconPt(ico), target, d, PAL[BY[id].pal].d));
+      }
+    });
+    if (!reduce) play(bundle, [
+      {offset:0,   opacity:0, transform:'translateY(0) rotate(-14deg) scale(.5)', easing:'cubic-bezier(.3,1.5,.5,1)'},
+      {offset:.2,  opacity:1, transform:'translateY(0) rotate(-6deg) scale(1)', easing:'ease-in-out'},
+      {offset:.58, opacity:1, transform:'translateY(-4px) rotate(-4deg) scale(1)', easing:'cubic-bezier(.6,0,.9,.4)'},
+      {offset:.97, opacity:1, transform:'translateY(170px) rotate(3deg) scale(1)'},
+      {offset:1,   opacity:0, transform:'translateY(170px) rotate(3deg) scale(1)'},
+    ], {duration:900, delay:660});
+    await wait(1490);
+    state.archived = true;
+    render(900);
+    if (!reduce) bx.animate([
+      {transform:'scale(1,1)'}, {transform:'scale(1.03,.95)', offset:.3}, {transform:'scale(.99,1.015)', offset:.65}, {transform:'scale(1,1)'},
+    ], {duration:460, easing:'ease-out'});
+    bump($('#row-archive .ico'), true);
+    await Promise.all(flights);
+    await wait(320);
+    setArchive('done');
+    state.busy = false;
+  }
+
+  async function undo() {
+    state.busy = true;
+    setArchive('undoing');
+    const source = bundlePt();
+    if (!reduce) play(bundle, [
+      {offset:0,   opacity:1, transform:'translateY(170px) rotate(3deg) scale(1)', easing:'cubic-bezier(.2,.8,.3,1)'},
+      {offset:.55, opacity:1, transform:'translateY(0) rotate(-6deg) scale(1.05)', easing:'ease-in'},
+      {offset:1,   opacity:0, transform:'translateY(-2px) rotate(-10deg) scale(.5)'},
+    ], {duration:720});
+    await wait(120);
+    state.archived = false;
+    render(900);
+    bump($('#row-archive .ico'), false);
+    await wait(300);
+    const flights = [];
+    let k = 0;
+    MOVES.forEach(([id, n]) => {
+      const ico = $(`#row-${id} .ico`);
+      for (let j = 0; j < n; j++) flights.push(flySheet(source, iconPt(ico), k++ * 70, PAL[BY[id].pal].d).then(() => bump(ico, true)));
+    });
+    await Promise.all(flights);
+    setArchive('idle');
+    state.busy = false;
+  }
+  archiveBtn.addEventListener('click', () => {
+    if (state.busy) return;
+    archiveBtn.dataset.mode === 'done' ? undo() : archive();
+  });
+
+  // ---------- Access tab ----------
+  const ROLES = ['Can view', 'Can comment', 'Can edit'];
+  const PEOPLE = [
+    {i:'DK', name:'Dana K.',  sub:'Design lead',       role:'Owner',       pal:'yellow'},
+    {i:'TA', name:'Timur A.', sub:'Motion designer',   role:'Can edit',    pal:'red'},
+    {i:'SM', name:'Sofia M.', sub:'Copywriter',        role:'Can edit',    pal:'blue'},
+    {i:'LP', name:'Leo P.',   sub:'Photographer',      role:'Can view',    pal:'teal'},
+    {i:'MO', name:'Mira O.',  sub:'Marketing manager', role:'Can comment', pal:'gray'},
+  ];
+  const INVITES = [
+    {i:'AR', name:'Aru R.',   sub:'Producer',            pal:'teal'},
+    {i:'JK', name:'Jonas K.', sub:'Front-end developer', pal:'yellow'},
+    {i:'NB', name:'Nadia B.', sub:'Illustrator',         pal:'red'},
+  ];
+  let invited = 0;
+  const peopleCount = () => PEOPLE.length + invited;
+  const peopleEl = $('#people'), inviteBtn = $('#inviteBtn'), inviteLbl = $('#inviteLbl');
+  const CHEV = '<svg viewBox="0 0 12 12"><path d="M3.5 4.5L6 2l2.5 2.5M3.5 7.5L6 10l2.5-2.5"/></svg>';
+  function personRow(p, isInvite) {
+    const el = document.createElement('div');
+    el.className = 'person';
+    const pal = PAL[p.pal];
+    const role = p.role === 'Owner'
+      ? '<span class="role static">Owner</span>'
+      : isInvite
+        ? '<span class="role invited">Invited</span>'
+        : `<button class="role" type="button" aria-label="Change role for ${p.name}, now ${p.role}"><span>${p.role}</span>${CHEV}</button>`;
+    el.innerHTML = `<span class="av" style="--l:${pal.l};--m:${pal.m}">${p.i}</span>
+      <span class="r-txt"><span class="r-name">${p.name}</span><span class="r-sub">${p.sub}</span></span>${role}`;
+    const btn = el.querySelector('button.role');
+    if (btn) btn.addEventListener('click', () => {
+      p.role = ROLES[(ROLES.indexOf(p.role) + 1) % ROLES.length];
+      btn.firstChild.textContent = p.role;
+      btn.setAttribute('aria-label', `Change role for ${p.name}, now ${p.role}`);
+      if (!reduce) btn.animate([{transform:'scale(.92)'}, {transform:'scale(1)'}], {duration:300, easing:'cubic-bezier(.3,1.5,.5,1)'});
+    });
+    return el;
+  }
+  PEOPLE.forEach(p => peopleEl.appendChild(personRow(p)));
+  const setInvite = () => {
+    const left = INVITES.length - invited;
+    inviteBtn.disabled = left === 0;
+    setLabel(inviteLbl, left ? `${ICON.plus}<span>Invite teammate</span><span class="muted">· ${left} pending</span>` : `${ICON.ok}<span>Everyone is invited</span>`);
+  };
+  inviteBtn.addEventListener('click', () => {
+    if (invited >= INVITES.length) return;
+    const row = personRow(INVITES[invited++], true);
+    peopleEl.appendChild(row);
+    if (!reduce) {
+      const h = row.offsetHeight;
+      row.animate([{height:'0px', opacity:0, paddingBlock:'0px'}, {height:h + 'px', opacity:1, paddingBlock:'9px'}], {duration:380, easing:'cubic-bezier(.2,.8,.2,1)'});
+      row.querySelector('.av').animate([{transform:'scale(.4)'}, {transform:'scale(1)'}], {duration:480, easing:'cubic-bezier(.3,1.5,.5,1)'});
+    }
+    setInvite();
+    render(0);
+  });
+
+  // ---------- Tabs ----------
+  const tabsEl = $('#tabs'), tabBtns = [...tabsEl.querySelectorAll('.tab')];
+  function selectTab(name, focus) {
+    tabsEl.dataset.tab = name;
+    tabBtns.forEach(b => {
+      const on = b.dataset.tab === name;
+      b.setAttribute('aria-selected', String(on));
+      b.tabIndex = on ? 0 : -1;
+      if (on && focus) b.focus();
+    });
+    ['folders', 'access'].forEach(v => {
+      const el = $('#view-' + v), show = v === name;
+      if (el.hidden === !show) return;
+      el.hidden = !show;
+      if (show && !reduce) el.animate([{opacity:0, transform:'translateY(6px)'}, {opacity:1, transform:'none'}], {duration:300, easing:'cubic-bezier(.2,.8,.2,1)'});
+    });
+    if (name === 'access') { state.pinned = state.active = null; render(); }
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
+  tabsEl.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    selectTab(tabsEl.dataset.tab === 'folders' ? 'access' : 'folders', true);
+  });
+
+  // ---------- Show less ----------
+  const lessBtn = $('#lessBtn');
+  lessBtn.addEventListener('click', () => {
+    const collapsed = shell.classList.toggle('collapsed');
+    lessBtn.textContent = collapsed ? 'Show more' : 'Show less';
+    lessBtn.setAttribute('aria-expanded', String(!collapsed));
+    if (collapsed) clear();
+  });
+
+  // First frame: everything in place, folders rise out of the box one after another
+  setArchive('idle');
+  setInvite();
+  render(0);
+  applyLifts(heroSvg, snap().s, null, true);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    hbar.classList.add('ready');
+    heroSvg.querySelectorAll('.bf').forEach(g => {
+      g.querySelector('.lift').style.transitionDelay = (100 + BOX_FOLDERS.findIndex(f => f.cat === g.dataset.cat) * 70) + 'ms';
+    });
+    render(0);
+    setTimeout(() => heroSvg.querySelectorAll('.bf .lift').forEach(l => { l.style.transitionDelay = ''; }), 1100);
+  }));
+})();
+</script>
+</body>
+</html>
