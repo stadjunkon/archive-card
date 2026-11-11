@@ -157,7 +157,9 @@ button:disabled{cursor:default}
 .ok{width:20px;height:20px;border-radius:50%;background:#1DB874;display:grid;place-items:center}
 .lbl .ok svg{width:11px;height:11px;stroke:#fff;stroke-width:2.2}
 
-.av{width:40px;height:40px;justify-self:center;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:600;color:#1B1D24;background:linear-gradient(140deg,var(--l),var(--m));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 0 0 1px rgba(0,0,0,.05)}
+.av{position:relative;width:40px;height:40px;justify-self:center;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:600;color:#1B1D24;background:linear-gradient(140deg,var(--l),var(--m));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 0 0 1px rgba(0,0,0,.05)}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.av:has(img)::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.25)}
 .role{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;border:0;border-radius:99px;background:var(--seg);color:var(--fg);font-size:12.5px;font-weight:500;white-space:nowrap}
 .role svg{width:10px;height:10px;fill:none;stroke:var(--muted);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .role.static{background:none;color:var(--muted)}
@@ -704,16 +706,16 @@ html.pm-fs.pm-idle,html.pm-fs.pm-idle *{cursor:none!important}
   // ---------- Access tab ----------
   const ROLES = ['Can view', 'Can comment', 'Can edit'];
   const PEOPLE = [
-    {i:'DK', name:'Dana K.',  sub:'Design lead',       role:'Owner',       pal:'yellow'},
-    {i:'TA', name:'Timur A.', sub:'Motion designer',   role:'Can edit',    pal:'red'},
-    {i:'SM', name:'Sofia M.', sub:'Copywriter',        role:'Can edit',    pal:'blue'},
-    {i:'LP', name:'Leo P.',   sub:'Photographer',      role:'Can view',    pal:'teal'},
-    {i:'MO', name:'Mira O.',  sub:'Marketing manager', role:'Can comment', pal:'gray'},
+    {i:'DK', name:'Dana K.', img:'dana',  sub:'Design lead',       role:'Owner',       pal:'yellow'},
+    {i:'TA', name:'Timur A.', img:'timur', sub:'Motion designer',   role:'Can edit',    pal:'red'},
+    {i:'SM', name:'Sofia M.', img:'sofia', sub:'Copywriter',        role:'Can edit',    pal:'blue'},
+    {i:'LP', name:'Leo P.', img:'leo',   sub:'Photographer',      role:'Can view',    pal:'teal'},
+    {i:'MO', name:'Mira O.', img:'mira',  sub:'Marketing manager', role:'Can comment', pal:'gray'},
   ];
   const INVITES = [
-    {i:'AR', name:'Aru R.',   sub:'Producer',            pal:'teal'},
-    {i:'JK', name:'Jonas K.', sub:'Front-end developer', pal:'yellow'},
-    {i:'NB', name:'Nadia B.', sub:'Illustrator',         pal:'red'},
+    {i:'AR', name:'Aru R.', img:'aru',   sub:'Producer',            pal:'teal'},
+    {i:'JK', name:'Jonas K.', img:'jonas', sub:'Front-end developer', pal:'yellow'},
+    {i:'NB', name:'Nadia B.', img:'nadia', sub:'Illustrator',         pal:'red'},
   ];
   let invited = 0;
   const peopleCount = () => PEOPLE.length + invited;
@@ -728,7 +730,7 @@ html.pm-fs.pm-idle,html.pm-fs.pm-idle *{cursor:none!important}
       : isInvite
         ? '<span class="role invited">Invited</span>'
         : `<button class="role" type="button" aria-label="Change role for ${p.name}, now ${p.role}"><span>${p.role}</span>${CHEV}</button>`;
-    el.innerHTML = `<span class="av" style="--l:${pal.l};--m:${pal.m}">${p.i}</span>
+    el.innerHTML = `<span class="av" style="--l:${pal.l};--m:${pal.m}">${p.img ? `<img src="../assets/avatars/${p.img}.jpg" alt="" onerror="this.replaceWith('${p.i}')">` : p.i}</span>
       <span class="r-txt"><span class="r-name">${p.name}</span><span class="r-sub">${p.sub}</span></span>${role}`;
     const btn = el.querySelector('button.role');
     if (btn) btn.addEventListener('click', () => {
